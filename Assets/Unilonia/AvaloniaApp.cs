@@ -13,11 +13,6 @@ namespace Unilonia
     {
         public RawImage image;
 
-        public UnityAppBuilder SetupWithWindows()
-        {
-            return UnityAppBuilder.Configure<T>();
-        }
-
         public void SetupWithTopLevel(Action<UnityAppBuilder> customize)
         {
             var builder = UnityAppBuilder.Configure<T>();
