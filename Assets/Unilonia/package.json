@@ -1,0 +1,11 @@
+{
+  "name": "com.unilonia.unilonia",
+  "version": "0.0.1-preview",
+  "displayName": "Unilonia",
+  "description": "Unity plugin which allows running Avalonia on Unity",
+  "author": {
+    "name": "Jean-Francois Pustay",
+    "url": "https://github.com/TheKeyblader/Unilonia"
+  },
+  "keywords": ["Avalonia","UI","Xaml"]
+}
