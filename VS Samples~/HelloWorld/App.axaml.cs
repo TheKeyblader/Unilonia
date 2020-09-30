@@ -17,6 +17,10 @@ namespace HelloWorld
             {
                 single.MainView = new MainView();
             }
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow();
+            }
 
             base.OnFrameworkInitializationCompleted();
         }

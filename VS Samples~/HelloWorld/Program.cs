@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Avalonia;
-using Avalonia.ReactiveUI;
-using TodoApp;
-using TodoApp.Views;
 
-namespace Exe
+namespace HelloWorld
 {
-    class Program
+#if NETCOREAPP
+    public class Program
     {
         public static void Main(string[] args)
         {
@@ -14,9 +14,10 @@ namespace Exe
         }
 
         public static AppBuilder BuildAvaloniaApp() =>
-             AppBuilder.Configure<App>()
-                .LogToDebug()
+            AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .UseReactiveUI();
+                .LogToDebug();
     }
+#endif
 }
+
