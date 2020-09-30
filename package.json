@@ -1,6 +1,6 @@
 {
   "name": "com.unilonia.unilonia",
-  "version": "0.0.1-preview",
+  "version": "0.1.0",
   "displayName": "Unilonia",
   "description": "Unity plugin which allows running Avalonia on Unity",
   "author": {
