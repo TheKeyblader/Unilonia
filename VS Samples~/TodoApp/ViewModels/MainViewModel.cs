@@ -22,7 +22,7 @@ namespace TodoApp.ViewModels
             Input = string.Empty;
 
             var nomEmpty = this.WhenAnyValue(m => m.Input,
-                i => !string.IsNullOrEmpty(i));
+                i => !string.IsNullOrWhiteSpace(i));
             AddCommand = ReactiveCommand.Create(AddTodo, nomEmpty);
 
         }
