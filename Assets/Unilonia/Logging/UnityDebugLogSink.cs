@@ -126,13 +126,18 @@ namespace Unilonia.Logging
                     if (r.Peek != '{')
                     {
                         result.Append('\'');
-                        result.Append(i++ switch
+                        switch (i++)
                         {
-                            0 => v0,
-                            1 => v1,
-                            2 => v2,
-                            _ => null
-                        });
+                            case 0:
+                                result.Append(v0);
+                                break;
+                            case 1:
+                                result.Append(v1);
+                                break;
+                            case 2:
+                                result.Append(v2);
+                                break;
+                        }
                         result.Append('\'');
                         r.TakeUntil('}');
                         r.Take();

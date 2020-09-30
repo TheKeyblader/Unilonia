@@ -19,4 +19,4 @@ We will create the contributing rules as this project grows
 
 ## License
 
-Unilonia is licenced under the MIT License
+Unilonia is licenced under the [MIT License](https://github.com/TheKeyblader/Unilonia/blob/upm/LICENSE)
