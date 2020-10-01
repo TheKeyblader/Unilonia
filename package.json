@@ -1,0 +1,31 @@
+{
+  "name": "com.unilonia.unilonia",
+  "version": "0.2.1",
+  "displayName": "Unilonia",
+  "description": "Unity plugin which allows running Avalonia on Unity",
+  "author": {
+    "name": "Jean-Francois Pustay",
+    "url": "https://github.com/TheKeyblader/Unilonia"
+  },
+  "dependencies": {
+    "com.solidalloy.type.references": "2.1.0"
+  },
+  "keywords": [
+    "Avalonia",
+    "UI",
+    "Xaml"
+  ],
+  "samples": [
+    {
+      "displayName": "Hello World",
+      "description": "Simple Hello World",
+      "path": "Samples~/HelloWorld"
+    },
+    {
+      "displayName": "TodoApp",
+      "description": "Simple TodoApp",
+      "path": "Samples~/TodoApp"
+    }
+  ],
+  "unity": "2019.4"
+}

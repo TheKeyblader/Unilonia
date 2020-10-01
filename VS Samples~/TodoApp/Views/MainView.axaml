@@ -1,0 +1,25 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:m="clr-namespace:TodoApp.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TodoApp.Views.MainView">
+  <Grid ColumnDefinitions="*,*,*" Margin="30">
+    <StackPanel>
+      <TextBlock Text="Todo" />
+      <TextBox Text="{Binding Input}"/>
+      <Button Content="Add" HorizontalAlignment="Right" Command="{Binding AddCommand}" />
+    </StackPanel>
+    <ListBox Grid.Column="3" Items="{Binding Todos}">
+      <ListBox.ItemTemplate>
+        <DataTemplate DataType="{x:Type m:TodoModel}">
+          <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding Did}" />
+            <TextBlock Margin="10,0,0,0" Text="{Binding Name}"/>
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>
