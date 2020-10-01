@@ -1,5 +1,20 @@
 {
   "dependencies": {
+    "com.solidalloy.type.references": {
+      "version": "https://github.com/SolidAlloy/ClassTypeReference-for-Unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "0b3a64dbfa0050f9bc42ba34ff208dfee96d9137"
+    },
+    "com.unilonia.unilonia": {
+      "version": "file:Unilonia",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.solidalloy.type.references": "2.1.0"
+      }
+    },
     "com.unity.ext.nunit": {
       "version": "1.0.0",
       "depth": 1,

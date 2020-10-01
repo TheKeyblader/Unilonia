@@ -7,8 +7,15 @@
     "name": "Jean-Francois Pustay",
     "url": "https://github.com/TheKeyblader/Unilonia"
   },
-  "keywords": ["Avalonia","UI","Xaml"],
-  "samples":[
+  "dependencies": {
+    "com.solidalloy.type.references": "2.1.0"
+  },
+  "keywords": [
+    "Avalonia",
+    "UI",
+    "Xaml"
+  ],
+  "samples": [
     {
       "displayName": "Hello World",
       "description": "Simple Hello World",
@@ -19,5 +26,6 @@
       "description": "Simple TodoApp",
       "path": "Samples~/TodoApp"
     }
-  ]
+  ],
+  "unity": "2019.4"
 }
