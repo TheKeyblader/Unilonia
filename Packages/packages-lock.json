@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.solidalloy.type.references": "2.1.0"
+        "com.solidalloy.type.references": "2.2.3"
       }
     },
     "com.unity.ext.nunit": {

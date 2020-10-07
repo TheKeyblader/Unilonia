@@ -8,7 +8,7 @@
     "url": "https://github.com/TheKeyblader/Unilonia"
   },
   "dependencies": {
-    "com.solidalloy.type.references": "2.1.0"
+    "com.solidalloy.type.references": "2.2.3"
   },
   "keywords": [
     "Avalonia",
