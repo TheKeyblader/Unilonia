@@ -11,10 +11,14 @@ using Avalonia.Rendering;
 using Unilonia.Input;
 using UnityEngine;
 using UnityEngine.UI;
+using Canvas = UnityEngine.Canvas;
 using Screen = UnityEngine.Screen;
 
 namespace Unilonia
 {
+    [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(RectTransform))]
+    [RequireComponent(typeof(RawImage))]
     public class TopLevelImpl : MonoBehaviour, ITopLevelImpl
     {
         public Size ClientSize { get; private set; }
@@ -53,8 +57,13 @@ namespace Unilonia
 
         public ExternalRenderTarget Target;
 
-        public void Setup(RawImage image)
+        public void Setup()
         {
+            var canvas = GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.pixelPerfect = true;
+
+            var image = gameObject.GetComponent<RawImage>();
             Target = new ExternalRenderTarget(image);
             Surfaces = new object[] { Target };
 
@@ -95,7 +104,7 @@ namespace Unilonia
 
         public void Dispose()
         {
-            Target.Dispose();
+            Target?.Dispose();
             Target = null;
         }
 
