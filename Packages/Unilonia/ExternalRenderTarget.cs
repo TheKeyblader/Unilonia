@@ -84,7 +84,6 @@ namespace Unilonia
                 Format = Format.B8G8R8A8_UNorm,
                 Height = (int)ScreenSize.Height,
                 Width = (int)ScreenSize.Width,
-                OptionFlags = ResourceOptionFlags.Shared,
                 SampleDescription = new SampleDescription(1, 0),
                 MipLevels = 1,
                 Usage = ResourceUsage.Default
@@ -107,8 +106,7 @@ namespace Unilonia
             UnityDispatcher.UnityThread.Post(() =>
             {
                 var unityRes = Direct3D11Device.OpenSharedResource<Resource>(visibleTexture.QueryInterface<Resource>().SharedHandle);
-                var unityTex = unityRes.QueryInterface<Texture2D>();
-                var resourceShader = new ShaderResourceView(Direct3D11Device, unityRes.QueryInterface<SharpDX.Direct3D11.Resource>());
+                var resourceShader = new ShaderResourceView(Direct3D11Device, unityRes.QueryInterface<Resource3D>());
 
                 var tex = UnityTexture.CreateExternalTexture(Screen.width, Screen.height, TextureFormat.BGRA32, false, true, resourceShader.NativePointer);
                 tex.hideFlags = HideFlags.DontSave;
