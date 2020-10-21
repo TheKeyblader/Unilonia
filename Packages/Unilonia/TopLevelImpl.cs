@@ -8,6 +8,7 @@ using Avalonia.Input.Raw;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering;
+using Avalonia.Threading;
 using Unilonia.Input;
 using UnityEngine;
 using UnityEngine.UI;
@@ -64,18 +65,23 @@ namespace Unilonia
             canvas.pixelPerfect = true;
 
             var image = gameObject.GetComponent<RawImage>();
-            Target = new ExternalRenderTarget(image);
+            Target = new ExternalRenderTarget(image)
+            {
+                ScreenSize = ClientSize
+            };
             Surfaces = new object[] { Target };
 
 #if ENABLE_INPUT_SYSTEM
             var input = gameObject.AddComponent<UnityInputSystem>();
             input.TopLevel = this;
 #endif
-
-            _root = new EmbeddableControlRoot(this);
-            _root.TransparencyLevelHint = WindowTransparencyLevel.Transparent;
-            _root.Background = new SolidColorBrush(Colors.Transparent);
-            _root.Prepare();
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                _root = new EmbeddableControlRoot(this);
+                _root.TransparencyLevelHint = WindowTransparencyLevel.Transparent;
+                _root.Background = new SolidColorBrush(Colors.Transparent);
+                _root.Prepare();
+            }).Wait();
         }
 
         public void LateUpdate()
@@ -83,10 +89,18 @@ namespace Unilonia
             if (ClientSize.Width != Screen.width || ClientSize.Height != Screen.height)
             {
                 ClientSize = new Size(Screen.width, Screen.height);
-                Target.DestroyRenderTarget();
-                Resized?.Invoke(ClientSize);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    Target.ScreenSize = ClientSize;
+                    Target.DestroyRenderTarget();
+                    Resized?.Invoke(ClientSize);
+                });
             }
-            Paint?.Invoke(new Avalonia.Rect(0, 0, Screen.width, Screen.height));
+            Dispatcher.UIThread.Post(() =>
+            {
+                Paint?.Invoke(new Avalonia.Rect(0, 0, ClientSize.Width, ClientSize.Height));
+            });
+
         }
 
         public void OnDestroy()
