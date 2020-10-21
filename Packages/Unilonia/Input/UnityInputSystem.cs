@@ -9,6 +9,8 @@ using AvaKey = Avalonia.Input.Key;
 using UniKey = UnityEngine.InputSystem.Key;
 using Screen = UnityEngine.Screen;
 using System.Linq;
+using Avalonia.Threading;
+using System.Globalization;
 
 namespace Unilonia.Input
 {
@@ -16,7 +18,7 @@ namespace Unilonia.Input
     {
         internal TopLevelImpl TopLevel { get; set; }
         private Vector2 oldPosition;
-        private uint Timestamp => (uint)(Time.time * 1000);
+        private uint Timestamp { get; set; }
         private IKeyboardDevice keyboard;
 
         public void Awake()
@@ -30,6 +32,8 @@ namespace Unilonia.Input
 
         public void Update()
         {
+            Timestamp = (uint)(Time.time * 1000);
+            var modifiers = GetRawInputModifiers();
             if (Mouse.current != null)
             {
                 var toTransform = Mouse.current.position.ReadValue();
@@ -37,20 +41,29 @@ namespace Unilonia.Input
                 if (oldPosition != newPosition)
                 {
                     oldPosition = newPosition;
-                    TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
-                        TopLevel.InputRoot, RawPointerEventType.Move, oldPosition.ToAvalonia(), GetRawInputModifiers()));
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.Move, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
 
                 }
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
-                        TopLevel.InputRoot, RawPointerEventType.LeftButtonDown, oldPosition.ToAvalonia(), GetRawInputModifiers()));
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.LeftButtonDown, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
                 }
                 if (Mouse.current.leftButton.wasReleasedThisFrame)
                 {
-                    TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
-                        TopLevel.InputRoot, RawPointerEventType.LeftButtonUp, oldPosition.ToAvalonia(), GetRawInputModifiers()));
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.LeftButtonUp, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
                 }
             }
 
@@ -69,11 +82,17 @@ namespace Unilonia.Input
 
                         if (key.wasPressedThisFrame)
                         {
-                            TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyDown, keycode.Value, GetRawInputModifiers()));
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyDown, keycode.Value, modifiers));
+                            }, DispatcherPriority.Input);
                         }
                         if (key.wasReleasedThisFrame)
                         {
-                            TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyUp, keycode.Value, GetRawInputModifiers()));
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyUp, keycode.Value, modifiers));
+                            }, DispatcherPriority.Input);
                         }
                     }
                 }
@@ -84,8 +103,10 @@ namespace Unilonia.Input
         private void CharEvent(char character)
         {
             if (excludeChars.Contains(character)) return;
-            var keyboard = AvaloniaLocator.Current.GetService<IKeyboardDevice>();
-            TopLevel.Input?.Invoke(new RawTextInputEventArgs(keyboard, Timestamp, TopLevel.InputRoot, new string(character, 1)));
+            Dispatcher.UIThread.Post(() =>
+            {
+                TopLevel.Input?.Invoke(new RawTextInputEventArgs(keyboard, Timestamp, TopLevel.InputRoot, new string(character, 1)));
+            }, DispatcherPriority.Input);
         }
 
         private RawInputModifiers GetRawInputModifiers()

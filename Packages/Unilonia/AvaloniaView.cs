@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Dialogs;
+using Avalonia.Threading;
 using Packages.Unilonia.Selectors;
 using System;
 using TypeReferences;
@@ -20,7 +21,10 @@ namespace Packages.Unilonia
             AvaloniaApp.Start();
             var topLevel = gameObject.AddComponent<TopLevelImpl>();
             topLevel.Setup();
-            topLevel.Content = (Control)Activator.CreateInstance(viewType.Type, new object[0]);
+            Dispatcher.UIThread.Post(() =>
+            {
+                topLevel.Content = (Control)Activator.CreateInstance(viewType.Type, new object[0]);
+            });
         }
     }
 }

@@ -42,8 +42,8 @@ namespace Unilonia
                 .Bind<IPlatformIconLoader>().ToSingleton<PlatformIconLoader>()
                 .Bind<PlatformHotkeyConfiguration>().ToSingleton<PlatformHotkeyConfiguration>()
                 .Bind<IRenderLoop>().ToSingleton<RenderLoop>()
-                .Bind<IPlatformThreadingInterface>().ToConstant(PlatformThreadingInterface.Instance)
-                .Bind<IRenderTimer>().ToConstant(PlatformThreadingInterface.Instance);
+                .Bind<IPlatformThreadingInterface>().ToSingleton<InternalPlatformThreadingInterface>()
+                .Bind<IRenderTimer>().ToConstant(new DefaultRenderTimer(60));
 
         }
 

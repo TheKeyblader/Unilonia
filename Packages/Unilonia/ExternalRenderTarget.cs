@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Direct2D1;
+using Packages.Unilonia;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -13,6 +15,7 @@ using DeviceContext = SharpDX.Direct2D1.DeviceContext;
 using Factory = SharpDX.Direct2D1.Factory;
 using RenderTarget = SharpDX.Direct2D1.RenderTarget;
 using Resource = SharpDX.DXGI.Resource;
+using Resource3D = SharpDX.Direct3D11.Resource;
 using Texture2D = SharpDX.Direct3D11.Texture2D;
 using UnityTexture = UnityEngine.Texture2D;
 
@@ -22,26 +25,27 @@ namespace Unilonia
     {
         public RawImage Image { get; set; }
 
-        private Texture2D texture;
+        private Texture2D renderedTexture;
+        private Texture2D visibleTexture;
         private DeviceContext renderTarget;
-        private SharpDX.Direct2D1.Device Direct2D1Device;
-        private SharpDX.Direct3D11.Device Direct3D11Device;
-        private SharpDX.DXGI.Device1 DxgiDevice;
+        private static SharpDX.Direct3D11.Device Direct3D11Device;
+        public Size ScreenSize { get; set; }
+
+        static ExternalRenderTarget()
+        {
+            var empty = new UnityTexture(1, 1);
+            var emptyText = new Texture2D(empty.GetNativeTexturePtr());
+            Direct3D11Device = emptyText.Device;
+        }
 
         public ExternalRenderTarget(RawImage image)
         {
             Image = image;
-
-            var empty = new UnityTexture(1, 1);
-            var emptyText = new Texture2D(empty.GetNativeTexturePtr());
-            Direct3D11Device = emptyText.Device;
-            DxgiDevice = Direct3D11Device.QueryInterface<SharpDX.DXGI.Device1>();
-            Direct2D1Device = new SharpDX.Direct2D1.Device(Direct2D1Platform.Direct2D1Factory, DxgiDevice);
         }
 
         public void AfterDrawing()
         {
-
+            Direct2D1Platform.Direct3D11Device.ImmediateContext.CopyResource(renderedTexture, visibleTexture);
         }
 
         public void BeforeDrawing()
@@ -51,10 +55,15 @@ namespace Unilonia
 
         public void DestroyRenderTarget()
         {
-            UnityEngine.Object.Destroy(Image.texture);
-            Image.texture = null;
-            texture.Dispose();
-            texture = null;
+            UnityDispatcher.UnityThread.Post(() =>
+            {
+                UnityEngine.Object.Destroy(Image.texture);
+                Image.texture = null;
+            });
+            renderedTexture.Dispose();
+            renderedTexture = null;
+            visibleTexture.Dispose();
+            visibleTexture = null;
             renderTarget.Dispose();
             renderTarget = null;
         }
@@ -67,30 +76,51 @@ namespace Unilonia
 
         private DeviceContext Create()
         {
-            texture = new Texture2D(Direct3D11Device, new Texture2DDescription
+            renderedTexture = new Texture2D(Direct2D1Platform.Direct3D11Device, new Texture2DDescription
             {
                 ArraySize = 1,
                 BindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Format = Format.B8G8R8A8_UNorm,
-                Height = Screen.height,
-                Width = Screen.width,
-                OptionFlags = ResourceOptionFlags.None,
+                Height = (int)ScreenSize.Height,
+                Width = (int)ScreenSize.Width,
+                OptionFlags = ResourceOptionFlags.Shared,
                 SampleDescription = new SampleDescription(1, 0),
                 MipLevels = 1,
                 Usage = ResourceUsage.Default
             });
 
+            visibleTexture = new Texture2D(Direct2D1Platform.Direct3D11Device, new Texture2DDescription
+            {
+                ArraySize = 1,
+                BindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget,
+                CpuAccessFlags = CpuAccessFlags.None,
+                Format = Format.B8G8R8A8_UNorm,
+                Height = (int)ScreenSize.Height,
+                Width = (int)ScreenSize.Width,
+                OptionFlags = ResourceOptionFlags.Shared,
+                SampleDescription = new SampleDescription(1, 0),
+                MipLevels = 1,
+                Usage = ResourceUsage.Default
+            });
 
-            var tex = UnityTexture.CreateExternalTexture(Screen.width, Screen.height, TextureFormat.BGRA32, false, true, texture.NativePointer);
-            Image.texture = tex;
-            Image.uvRect = new Rect(0, 1, 1, -1);
-            Image.color = Color.white;
-            Image.texture.filterMode = FilterMode.Trilinear;
+            UnityDispatcher.UnityThread.Post(() =>
+            {
+                var unityRes = Direct3D11Device.OpenSharedResource<Resource>(visibleTexture.QueryInterface<Resource>().SharedHandle);
+                var unityTex = unityRes.QueryInterface<Texture2D>();
+                var resourceShader = new ShaderResourceView(Direct3D11Device, unityRes.QueryInterface<SharpDX.Direct3D11.Resource>());
 
-            var surface = texture.QueryInterface<Surface>();
+                var tex = UnityTexture.CreateExternalTexture(Screen.width, Screen.height, TextureFormat.BGRA32, false, true, resourceShader.NativePointer);
+                tex.hideFlags = HideFlags.DontSave;
+                Image.texture = tex;
+                Image.uvRect = new UnityEngine.Rect(0, 1, 1, -1);
+                Image.color = Color.white;
+                Image.texture.filterMode = FilterMode.Trilinear;
+            });
 
-            renderTarget = new DeviceContext(Direct2D1Device, DeviceContextOptions.EnableMultithreadedOptimizations)
+            var surface = renderedTexture.QueryInterface<Surface>();
+
+            renderTarget = new DeviceContext(Direct2D1Platform.Direct2D1Device, DeviceContextOptions.EnableMultithreadedOptimizations)
             {
                 DotsPerInch = new SharpDX.Size2F(96, 96)
             };
@@ -115,8 +145,6 @@ namespace Unilonia
         public void Dispose()
         {
             DestroyRenderTarget();
-            Direct2D1Device.Dispose();
-            Direct2D1Device = null;
         }
     }
 }

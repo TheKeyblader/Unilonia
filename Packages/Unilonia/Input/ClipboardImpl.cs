@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Threading;
 using UnityEngine;
 
 namespace Unilonia.Input
@@ -10,8 +11,10 @@ namespace Unilonia.Input
     {
         public Task ClearAsync()
         {
-            GUIUtility.systemCopyBuffer = string.Empty;
-            return Task.CompletedTask;
+            return UnityDispatcher.UnityThread.InvokeAsync(() =>
+            {
+                GUIUtility.systemCopyBuffer = string.Empty;
+            });
         }
 
         public Task<object> GetDataAsync(string format) => throw new PlatformNotSupportedException();
@@ -20,15 +23,17 @@ namespace Unilonia.Input
 
         public Task<string> GetTextAsync()
         {
-            return Task.FromResult(GUIUtility.systemCopyBuffer);
+            return UnityDispatcher.UnityThread.InvokeAsync(() => GUIUtility.systemCopyBuffer);
         }
 
         public Task SetDataObjectAsync(IDataObject data) => throw new PlatformNotSupportedException();
 
         public Task SetTextAsync(string text)
         {
-            GUIUtility.systemCopyBuffer = text;
-            return Task.CompletedTask;
+            return UnityDispatcher.UnityThread.InvokeAsync(() =>
+            {
+                GUIUtility.systemCopyBuffer = text;
+            });
         }
     }
 }
