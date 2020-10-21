@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added 
+- Added UnityDispatcher allow to run unity function in avalonia
+- Now Avalonia has this own thread.
+
+### Changed 
+- Avalonia use this own direct3d device
+- Updated input implementation to work with multithreading.
+- Updated clipboard implementation to work with multithreading.
+- Updated AvaloniaView Component to work with multithreading.
+- Updated AvaloniaApp class to work with multithreading.
+### Removed
+- Removed PlatformThreadingInterface class used for single threading in unity
+
 ## [0.4.0] - 2020-10-09
 ### Added
 - New component AvaloniaView
