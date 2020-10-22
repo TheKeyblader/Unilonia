@@ -49,6 +49,11 @@ namespace Unilonia
             get => (Control)_root.Content;
             set => _root.Content = value;
         }
+        public bool DrawFPS
+        {
+            get => _root.Renderer.DrawFps;
+            set => _root.Renderer.DrawFps = value;
+        }
 
         public TopLevelImpl()
         {
