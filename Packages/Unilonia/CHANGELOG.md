@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added 
 - Added UnityDispatcher allow to run unity function in avalonia
 - Now Avalonia has this own thread.
+- Added draw fps option
 
 ### Changed 
 - Avalonia use this own direct3d device
