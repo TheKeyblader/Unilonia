@@ -15,4 +15,5 @@ MonoBehaviour:
   applicationType:
     GuidAssignmentFailed: 0
     GUID: 
-    _typeNameAndAssembly: HelloWorld.App, HelloWorld
+    _typeNameAndAssembly: TodoApp.App, TodoApp
+  useDeferredRendering: 1

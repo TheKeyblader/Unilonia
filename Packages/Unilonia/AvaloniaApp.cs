@@ -55,7 +55,7 @@ namespace Unilonia
                     init = new EventWaitHandle(false, EventResetMode.ManualReset);
                     avaloniaThread = new Thread(AvaloniaThread);
                     avaloniaThread.Name = "Avalonia Thread";
-                    avaloniaThread.Start(settings);
+                    avaloniaThread.Start(settings.applicationType.Type);
                     init.WaitOne();
                     init.Dispose();
                 }
@@ -64,11 +64,11 @@ namespace Unilonia
 
         public static void AvaloniaThread(object parameters)
         {
-            var settings = (UniloniaSettings)parameters;
+            var applicationType = (Type)parameters;
 
             var builderType = typeof(AppBuilderBase<>).MakeGenericType(typeof(UnityAppBuilder));
             var configureMethod = builderType.GetMethod(nameof(UnityAppBuilder.Configure), BindingFlags.Public | BindingFlags.Static, null, new Type[0], null);
-            var builder = (UnityAppBuilder)configureMethod.MakeGenericMethod(settings.applicationType.Type).Invoke(null, new object[0]);
+            var builder = (UnityAppBuilder)configureMethod.MakeGenericMethod(applicationType).Invoke(null, new object[0]);
 
             builder
                 .UseUnity()

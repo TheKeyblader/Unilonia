@@ -32,19 +32,19 @@ namespace Unilonia
 
         public static void Initialize(Type appType)
         {
+            var threading = new UniloniaPlatformThreadingInterface();
             AvaloniaLocator.CurrentMutable
                 .Bind<IClipboard>().ToSingleton<ClipboardImpl>()
                 .Bind<IStandardCursorFactory>().ToSingleton<CursorFactory>()
                 .Bind<IKeyboardDevice>().ToSingleton<KeyboardDevice>()
-                .Bind<IPlatformSettings>().ToConstant(s_instance)
                 .Bind<ISystemDialogImpl>().ToSingleton<SystemDialogImpl>()
+                .Bind<IPlatformSettings>().ToConstant(s_instance)
                 .Bind<IWindowingPlatform>().ToConstant(s_instance)
                 .Bind<IPlatformIconLoader>().ToSingleton<PlatformIconLoader>()
+                .Bind<IPlatformThreadingInterface>().ToConstant(threading)
                 .Bind<PlatformHotkeyConfiguration>().ToSingleton<PlatformHotkeyConfiguration>()
-                .Bind<IRenderLoop>().ToSingleton<RenderLoop>()
-                .Bind<IPlatformThreadingInterface>().ToSingleton<InternalPlatformThreadingInterface>()
+                .Bind<IRenderLoop>().ToConstant(new RenderLoop())
                 .Bind<IRenderTimer>().ToConstant(new DefaultRenderTimer(60));
-
         }
 
         public IWindowImpl CreateEmbeddableWindow()
