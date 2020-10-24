@@ -1,88 +1,87 @@
-﻿using Avalonia.Platform;
-using Avalonia.Threading;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System;
+using System.Reactive.Disposables;
 using System.Threading;
-using System.Threading.Tasks;
+using Avalonia.Platform;
+using Avalonia.Threading;
+using UnityEngine.Profiling;
 
 namespace Unilonia
 {
-    public class UniloniaPlatformThreadingInterface : IPlatformThreadingInterface
+    class UniloniaPlatformThreadingInterface : IPlatformThreadingInterface
     {
         public UniloniaPlatformThreadingInterface()
         {
-            TlsCurrentThreadIsLoopThread = true;
+            _thread = Thread.CurrentThread;
         }
 
-        private readonly AutoResetEvent _signaled = new AutoResetEvent(false);
+        private AutoResetEvent _event = new AutoResetEvent(false);
+        private Thread _thread;
+        private object _lock = new object();
+        private DispatcherPriority? _signaledPriority;
 
         public void RunLoop(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                Signaled?.Invoke(null);
-                _signaled.WaitOne();
-            }
-        }
-
-        class TimerImpl : IDisposable
-        {
-            private readonly DispatcherPriority _priority;
-            private readonly TimeSpan _interval;
-            private readonly Action _tick;
-            private Timer _timer;
-            private GCHandle _handle;
-
-            public TimerImpl(DispatcherPriority priority, TimeSpan interval, Action tick)
-            {
-                _priority = priority;
-                _interval = interval;
-                _tick = tick;
-                _timer = new Timer(OnTimer, null, interval, TimeSpan.FromMilliseconds(-1));
-                _handle = GCHandle.Alloc(_timer);
-            }
-
-            private void OnTimer(object state)
-            {
-                if (_timer == null)
-                    return;
-                Dispatcher.UIThread.Post(() =>
+                DispatcherPriority? signaled = null;
+                lock (_lock)
                 {
-
-                    if (_timer == null)
-                        return;
-                    _tick();
-                    _timer?.Change(_interval, TimeSpan.FromMilliseconds(-1));
-                });
-            }
-
-
-            public void Dispose()
-            {
-                _handle.Free();
-                _timer.Dispose();
-                _timer = null;
+                    signaled = _signaledPriority;
+                    _signaledPriority = null;
+                }
+                if (signaled.HasValue)
+                    Signaled?.Invoke(signaled);
+                WaitHandle.WaitAny(new[] { cancellationToken.WaitHandle, _event }, TimeSpan.FromMilliseconds(20));
             }
         }
 
         public IDisposable StartTimer(DispatcherPriority priority, TimeSpan interval, Action tick)
         {
-            return new TimerImpl(priority, interval, tick);
+            var cancelled = false;
+            var enqueued = false;
+            var l = new object();
+            var timer = new Timer(_ =>
+            {
+                lock (l)
+                {
+                    if (cancelled || enqueued)
+                        return;
+                    enqueued = true;
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        lock (l)
+                        {
+                            enqueued = false;
+                            if (cancelled)
+                                return;
+                            tick();
+                        }
+                    }, priority);
+                }
+            }, null, interval, interval);
+            return Disposable.Create(() =>
+            {
+                lock (l)
+                {
+                    timer.Dispose();
+                    cancelled = true;
+                }
+            });
         }
 
-        public void Signal(DispatcherPriority prio)
+        public void Signal(DispatcherPriority priority)
         {
-            _signaled.Set();
+            lock (_lock)
+            {
+                if (_signaledPriority == null || _signaledPriority.Value > priority)
+                {
+                    _signaledPriority = priority;
+                }
+                _event.Set();
+            }
         }
 
-        [ThreadStatic] private static bool TlsCurrentThreadIsLoopThread;
-
-        public bool CurrentThreadIsLoopThread => TlsCurrentThreadIsLoopThread;
+        public bool CurrentThreadIsLoopThread => _thread == Thread.CurrentThread;
         public event Action<DispatcherPriority?> Signaled;
-        public event Action<TimeSpan> Tick;
-
     }
 }
