@@ -65,6 +65,40 @@ namespace Unilonia.Input
                             TopLevel.InputRoot, RawPointerEventType.LeftButtonUp, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
                 }
+
+                if (Mouse.current.rightButton.wasPressedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.RightButtonDown, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+                if (Mouse.current.rightButton.wasReleasedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.RightButtonUp, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+
+                if (Mouse.current.middleButton.wasPressedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.MiddleButtonDown, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+                if (Mouse.current.middleButton.wasReleasedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.MiddleButtonUp, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
             }
 
             if (Keyboard.current != null)
