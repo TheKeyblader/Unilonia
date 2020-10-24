@@ -250,6 +250,10 @@ MonoBehaviour:
     GUID: 
     _typeNameAndAssembly: HelloWorld.MainView, HelloWorld
   drawFps: 0
+  overrideApplicationType:
+    GuidAssignmentFailed: 0
+    GUID: 
+    _typeNameAndAssembly: HelloWorld.App, HelloWorld
 --- !u!114 &454875378
 MonoBehaviour:
   m_ObjectHideFlags: 0
