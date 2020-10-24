@@ -11,6 +11,7 @@ using Screen = UnityEngine.Screen;
 using System.Linq;
 using Avalonia.Threading;
 using System.Globalization;
+using System;
 
 namespace Unilonia.Input
 {
@@ -18,7 +19,6 @@ namespace Unilonia.Input
     {
         internal TopLevelImpl TopLevel { get; set; }
         private Vector2 oldPosition;
-        private uint Timestamp { get; set; }
         private IKeyboardDevice keyboard;
 
         public void Awake()
@@ -32,7 +32,7 @@ namespace Unilonia.Input
 
         public void Update()
         {
-            Timestamp = (uint)(Time.time * 1000);
+            ulong timestamp = (ulong)(Environment.TickCount & int.MaxValue);
             var modifiers = GetRawInputModifiers();
             if (Mouse.current != null)
             {
@@ -43,7 +43,7 @@ namespace Unilonia.Input
                     oldPosition = newPosition;
                     Dispatcher.UIThread.Post(() =>
                     {
-                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
                             TopLevel.InputRoot, RawPointerEventType.Move, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
 
@@ -53,7 +53,7 @@ namespace Unilonia.Input
                 {
                     Dispatcher.UIThread.Post(() =>
                     {
-                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
                             TopLevel.InputRoot, RawPointerEventType.LeftButtonDown, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
                 }
@@ -61,7 +61,7 @@ namespace Unilonia.Input
                 {
                     Dispatcher.UIThread.Post(() =>
                     {
-                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, Timestamp,
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
                             TopLevel.InputRoot, RawPointerEventType.LeftButtonUp, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
                 }
@@ -84,14 +84,14 @@ namespace Unilonia.Input
                         {
                             Dispatcher.UIThread.Post(() =>
                             {
-                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyDown, keycode.Value, modifiers));
+                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, timestamp, TopLevel.InputRoot, RawKeyEventType.KeyDown, keycode.Value, modifiers));
                             }, DispatcherPriority.Input);
                         }
                         if (key.wasReleasedThisFrame)
                         {
                             Dispatcher.UIThread.Post(() =>
                             {
-                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, Timestamp, TopLevel.InputRoot, RawKeyEventType.KeyUp, keycode.Value, modifiers));
+                                TopLevel.Input?.Invoke(new RawKeyEventArgs(keyboard, timestamp, TopLevel.InputRoot, RawKeyEventType.KeyUp, keycode.Value, modifiers));
                             }, DispatcherPriority.Input);
                         }
                     }
@@ -105,7 +105,8 @@ namespace Unilonia.Input
             if (excludeChars.Contains(character)) return;
             Dispatcher.UIThread.Post(() =>
             {
-                TopLevel.Input?.Invoke(new RawTextInputEventArgs(keyboard, Timestamp, TopLevel.InputRoot, new string(character, 1)));
+                ulong timestamp = (ulong)(Environment.TickCount & int.MaxValue);
+                TopLevel.Input?.Invoke(new RawTextInputEventArgs(keyboard, timestamp, TopLevel.InputRoot, new string(character, 1)));
             }, DispatcherPriority.Input);
         }
 

@@ -10,17 +10,11 @@ using Avalonia.Platform;
 using Avalonia.Rendering;
 using Avalonia.Threading;
 using Unilonia.Input;
-using UnityEngine;
-using UnityEngine.UI;
-using Canvas = UnityEngine.Canvas;
-using Screen = UnityEngine.Screen;
 
 namespace Unilonia
 {
-    [RequireComponent(typeof(Canvas))]
-    [RequireComponent(typeof(RectTransform))]
-    [RequireComponent(typeof(RawImage))]
-    public class TopLevelImpl : MonoBehaviour, ITopLevelImpl
+
+    public class TopLevelImpl : ITopLevelImpl
     {
         public Size ClientSize { get; private set; }
 
@@ -29,7 +23,7 @@ namespace Unilonia
         public IEnumerable<object> Surfaces { get; private set; }
 
         public Action<RawInputEventArgs> Input { get; set; }
-        public Action<Avalonia.Rect> Paint { get; set; }
+        public Action<Rect> Paint { get; set; }
         public Action<Size> Resized { get; set; }
         public Action<double> ScalingChanged { get; set; }
         public Action<WindowTransparencyLevel> TransparencyLevelChanged { get; set; }
@@ -43,7 +37,10 @@ namespace Unilonia
 
         public AcrylicPlatformCompensationLevels AcrylicCompensationLevels => new AcrylicPlatformCompensationLevels();
 
+        private readonly bool useDeferredRenderer;
+        private readonly ExternalRenderTarget target;
         private EmbeddableControlRoot _root;
+
         public Control Content
         {
             get => (Control)_root.Content;
@@ -54,63 +51,30 @@ namespace Unilonia
             get => _root.Renderer.DrawFps;
             set => _root.Renderer.DrawFps = value;
         }
+        public IntPtr TexturePtr => target.TexturePtr;
 
-        public TopLevelImpl()
+        public TopLevelImpl(Size clientSize, bool useDeferredRenderer)
         {
             MouseDevice = new UnityMouseDevice();
-            ClientSize = new Size(Screen.width, Screen.height);
-        }
+            ClientSize = clientSize;
+            this.useDeferredRenderer = useDeferredRenderer;
 
-        public ExternalRenderTarget Target;
-
-        public void Setup()
-        {
-            var canvas = GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var image = gameObject.GetComponent<RawImage>();
-            Target = new ExternalRenderTarget(image)
+            target = new ExternalRenderTarget()
             {
-                ScreenSize = ClientSize
+                ClientSize = ClientSize
             };
-            Surfaces = new object[] { Target };
-
-#if ENABLE_INPUT_SYSTEM
-            var input = gameObject.AddComponent<UnityInputSystem>();
-            input.TopLevel = this;
-#endif
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                _root = new EmbeddableControlRoot(this);
-                _root.TransparencyLevelHint = WindowTransparencyLevel.Transparent;
-                _root.Background = new SolidColorBrush(Colors.Transparent);
-                _root.Prepare();
-            }).Wait();
+            Surfaces = new object[] { target };
         }
 
-        public void LateUpdate()
+        public void Init()
         {
-            if (ClientSize.Width != Screen.width || ClientSize.Height != Screen.height)
+            _root = new EmbeddableControlRoot(this)
             {
-                ClientSize = new Size(Screen.width, Screen.height);
-                Dispatcher.UIThread.Post(() =>
-                {
-                    Target.ScreenSize = ClientSize;
-                    Target.DestroyRenderTarget();
-                    Resized?.Invoke(ClientSize);
-                });
-            }
-            Dispatcher.UIThread.Post(() =>
-            {
-                Paint?.Invoke(new Avalonia.Rect(0, 0, ClientSize.Width, ClientSize.Height));
-            });
-
-        }
-
-        public void OnDestroy()
-        {
-            this.Dispose();
+                TransparencyLevelHint = WindowTransparencyLevel.Transparent,
+                Background = new SolidColorBrush(Colors.Transparent)
+            };
+            _root.Prepare();
+            _root.Renderer.Start();
         }
 
         public IPopupImpl CreatePopup()
@@ -118,18 +82,24 @@ namespace Unilonia
             return null;
         }
 
-        public IRenderer CreateRenderer(IRenderRoot root) => new DeferredRenderer(root,
-                AvaloniaLocator.Current.GetService<IRenderLoop>());
-
-        public void Dispose()
+        public IRenderer CreateRenderer(IRenderRoot root)
         {
-            Target?.Dispose();
-            Target = null;
+            if (useDeferredRenderer)
+            {
+                return new DeferredRenderer(root, AvaloniaLocator.Current.GetService<IRenderLoop>());
+            }
+            else
+            {
+                return new ImmediateRenderer(root);
+            }
         }
 
-        public void Invalidate(Avalonia.Rect rect)
+        public void Invalidate(Rect rect)
         {
-            //NO-OP
+            Dispatcher.UIThread.Post(() =>
+            {
+                Paint?.Invoke(rect);
+            }, DispatcherPriority.Render);
         }
 
         public Point PointToClient(PixelPoint point)
@@ -155,6 +125,32 @@ namespace Unilonia
         public void SetTransparencyLevelHint(WindowTransparencyLevel transparencyLevel)
         {
             //NO-OP
+        }
+
+        internal void Resize(Size size)
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                target.DestroyRenderTarget();
+                target.ClientSize = size;
+                Resized?.Invoke(size);
+            });
+        }
+
+        internal void Close()
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Closed?.Invoke();
+            }).Wait();
+        }
+
+        public void Dispose()
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                target.Dispose();
+            }).Wait();
         }
     }
 }

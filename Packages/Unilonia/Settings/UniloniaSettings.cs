@@ -14,13 +14,16 @@ namespace Unilonia.Settings
         [CustomInherits(typeof(AvaloniaApplication))]
         public TypeReference applicationType;
 
+        [InspectorName("Use deferred rendering")]
+        public bool useDeferredRendering = true;
+
         public static UniloniaSettings Load()
         {
 #if UNITY_EDITOR
             var settings = AssetDatabase.LoadAssetAtPath<UniloniaSettings>(SettingsPath);
             if (settings == null)
             {
-                settings = ScriptableObject.CreateInstance<UniloniaSettings>();
+                settings = CreateInstance<UniloniaSettings>();
                 AssetDatabase.CreateAsset(settings, SettingsPath);
                 AssetDatabase.SaveAssets();
             }
