@@ -65,6 +65,40 @@ namespace Unilonia.Input
                             TopLevel.InputRoot, RawPointerEventType.LeftButtonUp, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
                 }
+
+                if (Mouse.current.rightButton.wasPressedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.RightButtonDown, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+                if (Mouse.current.rightButton.wasReleasedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.RightButtonUp, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+
+                if (Mouse.current.middleButton.wasPressedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.MiddleButtonDown, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
+                if (Mouse.current.middleButton.wasReleasedThisFrame)
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawPointerEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, RawPointerEventType.MiddleButtonUp, oldPosition.ToAvalonia(), modifiers));
+                    }, DispatcherPriority.Input);
+                }
             }
 
             if (Keyboard.current != null)
@@ -78,7 +112,7 @@ namespace Unilonia.Input
                             keycode = displayToKeyDict[key.displayName];
                         if (uniKeyToAvaKeyDict.ContainsKey(key.keyCode))
                             keycode = uniKeyToAvaKeyDict[key.keyCode];
-                        if (keycode == null) continue;
+                        if (!keycode.HasValue) continue;
 
                         if (key.wasPressedThisFrame)
                         {
@@ -103,6 +137,7 @@ namespace Unilonia.Input
         private void CharEvent(char character)
         {
             if (excludeChars.Contains(character)) return;
+            if (char.GetUnicodeCategory(character) == UnicodeCategory.Control) return;
             Dispatcher.UIThread.Post(() =>
             {
                 ulong timestamp = (ulong)(Environment.TickCount & int.MaxValue);
@@ -171,7 +206,13 @@ namespace Unilonia.Input
             {UniKey.Space,AvaKey.Space },
             {UniKey.Backspace, AvaKey.Back },
             {UniKey.Enter,AvaKey.Enter },
-            {UniKey.NumpadEnter,AvaKey.Enter },
+            {UniKey.Home,AvaKey.Home },
+            {UniKey.LeftShift,AvaKey.LeftShift },
+            {UniKey.RightShift,AvaKey.RightShift },
+            {UniKey.LeftAlt,AvaKey.LeftAlt },
+            {UniKey.RightAlt,AvaKey.RightAlt },
+            {UniKey.LeftCtrl,AvaKey.LeftCtrl },
+            {UniKey.RightCtrl,AvaKey.RightCtrl },
             {UniKey.Tab,AvaKey.Tab },
             {UniKey.F1,AvaKey.F1 },
             {UniKey.F2,AvaKey.F2 },
@@ -185,6 +226,11 @@ namespace Unilonia.Input
             {UniKey.F10,AvaKey.F10 },
             {UniKey.F11,AvaKey.F11 },
             {UniKey.F12,AvaKey.F12 },
+            {UniKey.NumLock,AvaKey.NumLock },
+            {UniKey.NumpadMultiply,AvaKey.Multiply },
+            {UniKey.NumpadMinus,AvaKey.Subtract },
+            {UniKey.NumpadPlus,AvaKey.Add },
+            {UniKey.NumpadEnter,AvaKey.Enter },
             {UniKey.Numpad0,AvaKey.NumPad0 },
             {UniKey.Numpad1,AvaKey.NumPad1 },
             {UniKey.Numpad2,AvaKey.NumPad2 },
@@ -206,15 +252,16 @@ namespace Unilonia.Input
             {UniKey.Digit7,AvaKey.D7 },
             {UniKey.Digit8,AvaKey.D8 },
             {UniKey.Digit9,AvaKey.D9 },
-            {UniKey.LeftArrow,AvaKey.FnLeftArrow },
-            {UniKey.RightArrow,AvaKey.FnRightArrow },
-            {UniKey.UpArrow,AvaKey.FnUpArrow },
-            {UniKey.DownArrow,AvaKey.FnDownArrow },
+            {UniKey.LeftArrow,AvaKey.Left },
+            {UniKey.RightArrow,AvaKey.Right },
+            {UniKey.UpArrow,AvaKey.Up },
+            {UniKey.DownArrow,AvaKey.Down },
             {UniKey.Delete,AvaKey.Delete },
             {UniKey.End,AvaKey.End },
             {UniKey.Insert,AvaKey.Insert },
+            {UniKey.LeftWindows,AvaKey.LWin },
+            {UniKey.RightWindows,AvaKey.RWin },
             {UniKey.CapsLock,AvaKey.CapsLock },
-            {UniKey.NumLock,AvaKey.NumLock },
             {UniKey.PrintScreen,AvaKey.PrintScreen },
             {UniKey.Pause,AvaKey.Pause },
             {UniKey.OEM1,AvaKey.Oem1 },
