@@ -6,9 +6,11 @@ using System;
 using TypeReferences;
 using Unilonia;
 using Unilonia.Input;
+using Unilonia.Selectors;
 using Unilonia.Settings;
 using UnityEngine;
 using UnityEngine.UI;
+using AvaloniaApplication = Avalonia.Application;
 using Canvas = UnityEngine.Canvas;
 
 namespace Packages.Unilonia
@@ -24,6 +26,10 @@ namespace Packages.Unilonia
 
         [InspectorName("Draw FPS")]
         public bool drawFps;
+
+        [CustomInherits(typeof(AvaloniaApplication), ExcludeNone = false)]
+        [InspectorName("For sample only")]
+        public TypeReference overrideApplicationType;
 
         private TopLevelImpl topLevel;
         private Vector2Int screenSize;
@@ -46,7 +52,7 @@ namespace Packages.Unilonia
             var settings = UniloniaSettings.Load();
 
             if (viewType.Type == null) throw new ArgumentNullException("View");
-            AvaloniaApp.Start();
+            AvaloniaApp.Start(overrideApplicationType.Type);
 
             screenSize = new Vector2Int(Screen.width, Screen.height);
             topLevel = new TopLevelImpl(new Size(Screen.width, Screen.height), settings.useDeferredRendering);

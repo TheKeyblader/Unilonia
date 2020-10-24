@@ -40,7 +40,7 @@ namespace Unilonia
             _lock = new object();
         }
 
-        public static void Start()
+        public static void Start(Type overrideApplicationType = null)
         {
             lock (_lock)
             {
@@ -50,12 +50,12 @@ namespace Unilonia
                     gameObject.AddComponent<UnityDispatcher>();
 
                     var settings = UniloniaSettings.Load();
-                    if (settings.applicationType.Type == null) throw new ArgumentNullException(nameof(UniloniaSettings.applicationType));
+                    if (settings.applicationType.Type == null && overrideApplicationType == null) throw new ArgumentNullException(nameof(UniloniaSettings.applicationType));
 
                     init = new EventWaitHandle(false, EventResetMode.ManualReset);
                     avaloniaThread = new Thread(AvaloniaThread);
                     avaloniaThread.Name = "Avalonia Thread";
-                    avaloniaThread.Start(settings.applicationType.Type);
+                    avaloniaThread.Start(overrideApplicationType ?? settings.applicationType.Type);
                     init.WaitOne();
                     init.Dispose();
                 }
