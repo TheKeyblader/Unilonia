@@ -1,18 +1,27 @@
 {
   "dependencies": {
     "com.solidalloy.type.references": {
-      "version": "https://github.com/SolidAlloy/ClassTypeReference-for-Unity.git",
-      "depth": 0,
-      "source": "git",
+      "version": "2.5.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.solidalloy.util": "1.7.1"
+      },
+      "url": "https://package.openupm.com"
+    },
+    "com.solidalloy.util": {
+      "version": "1.7.1",
+      "depth": 2,
+      "source": "registry",
       "dependencies": {},
-      "hash": "0b3a64dbfa0050f9bc42ba34ff208dfee96d9137"
+      "url": "https://package.openupm.com"
     },
     "com.unilonia.unilonia": {
       "version": "file:Unilonia",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.solidalloy.type.references": "2.2.3"
+        "com.solidalloy.type.references": "2.5.1"
       }
     },
     "com.unity.ext.nunit": {
