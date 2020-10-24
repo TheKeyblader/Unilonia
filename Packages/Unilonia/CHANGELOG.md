@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Added draw fps option
 -   Added an global option "useDeferredRendering" with default at true
 -   Added UniloniaPlatformThreadingInterface to manage threading of Avalonia Thread
+-   Added an option "overrideApplicationType" on AvaloiniaView to override default Application type (for samples only)
 
 ### Changed
 
@@ -23,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Updated AvaloniaView Component to work with multithreading.
 -   Updated AvaloniaApp class to work with multithreading.
 -   Rewrite of AvaloniaView and TopLevelImpl to better separate Avalonia and Unity Code
+-   Updated Samples
+
+### Fixed
+
+- Added some missing mouse buttons
+- Added some missing keyboard keys
 
 ### Removed
 
