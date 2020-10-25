@@ -43,7 +43,6 @@ namespace Packages.Unilonia
             canvas.pixelPerfect = true;
 
             rawImage = GetComponent<RawImage>();
-            rawImage.uvRect = new UnityEngine.Rect(0, 1, 1, -1);
             rawImage.color = Color.white;
         }
 
@@ -76,24 +75,21 @@ namespace Packages.Unilonia
                 topLevel.DrawFPS = drawFps;
             }
 
-            if ((texture == null || topLevel.TexturePtr != texture.GetNativeTexturePtr()) && topLevel.TexturePtr != IntPtr.Zero)
+            if (texture != topLevel.Texture)
             {
-                texture = Texture2D.CreateExternalTexture(screenSize.x, screenSize.y, TextureFormat.BGRA32, false, true, topLevel.TexturePtr);
-                texture.hideFlags = HideFlags.DontSave;
+                texture = topLevel.Texture;
                 rawImage.texture = texture;
             }
 
             if (screenSize.x != Screen.width || screenSize.y != Screen.height)
             {
                 screenSize = new Vector2Int(Screen.width, Screen.height);
-                DestroyImmediate(texture);
                 topLevel.Resize(new Size(Screen.width, Screen.height));
             }
         }
 
         private void OnDestroy()
         {
-            DestroyImmediate(texture);
             topLevel.Close();
             topLevel.Dispose();
         }
