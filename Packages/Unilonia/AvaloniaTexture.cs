@@ -1,23 +1,21 @@
-﻿using Avalonia;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Threading;
-using System;
-using TypeReferences;
-using Unilonia;
-using Unilonia.Input;
 using Unilonia.Selectors;
-using Unilonia.Settings;
+using TypeReferences;
 using UnityEngine;
-using UnityEngine.UI;
 using AvaloniaApplication = Avalonia.Application;
-using Canvas = UnityEngine.Canvas;
+using Unilonia.Settings;
+using Avalonia.Threading;
+using Avalonia;
+using Unilonia.Input;
 
-namespace Packages.Unilonia
+namespace Unilonia
 {
-    [RequireComponent(typeof(Canvas))]
-    [RequireComponent(typeof(RectTransform))]
-    [RequireComponent(typeof(RawImage))]
-    public class AvaloniaView : MonoBehaviour
+    public class AvaloniaTexture : MonoBehaviour
     {
         [EmptyConstructor(typeof(UserControl))]
         [InspectorName("View")]
@@ -31,34 +29,25 @@ namespace Packages.Unilonia
         public TypeReference overrideApplicationType;
 
         private TopLevelImpl topLevel;
-        private Vector2Int screenSize;
+
+        public Vector2Int size;
         private Texture texture;
-        private RawImage rawImage;
-
-        private void Awake()
-        {
-            var canvas = GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            rawImage = GetComponent<RawImage>();
-            rawImage.color = Color.white;
-        }
+        public Texture Texture => texture;
 
         void Start()
         {
             var settings = UniloniaSettings.Load();
 
-            if (viewType.Type == null) throw new ArgumentNullException("View");
+            if (size == default) throw new ArgumentNullException(nameof(size));
+            if (viewType.Type == null) throw new ArgumentNullException(nameof(viewType));
             AvaloniaApp.Start(overrideApplicationType.Type);
 
-            screenSize = new Vector2Int(Screen.width, Screen.height);
-            topLevel = new TopLevelImpl(new Size(Screen.width, Screen.height), settings.useDeferredRendering);
+            topLevel = new TopLevelImpl(new Size(size.x, size.y), settings.useDeferredRendering);
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 topLevel.Init();
                 topLevel.Content = (Control)Activator.CreateInstance(viewType.Type, new object[0]);
-                topLevel.Paint(new Avalonia.Rect(0, 0, screenSize.x, screenSize.y));
+                topLevel.Paint(new Avalonia.Rect(0, 0, size.x, size.y));
             }).Wait();
 
 #if ENABLE_INPUT_SYSTEM
@@ -77,13 +66,11 @@ namespace Packages.Unilonia
             if (texture != topLevel.Texture)
             {
                 texture = topLevel.Texture;
-                rawImage.texture = texture;
             }
 
-            if (screenSize.x != Screen.width || screenSize.y != Screen.height)
+            if (topLevel.ClientSize.Width != size.x || topLevel.ClientSize.Height != size.y)
             {
-                screenSize = new Vector2Int(Screen.width, Screen.height);
-                topLevel.Resize(new Size(Screen.width, Screen.height));
+                topLevel.Resize(new Size(size.x, size.y));
             }
         }
 

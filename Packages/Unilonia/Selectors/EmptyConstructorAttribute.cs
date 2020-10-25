@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TypeReferences;
 
-namespace Packages.Unilonia.Selectors
+namespace Unilonia.Selectors
 {
     public class EmptyConstructorAttribute : TypeOptionsAttribute
     {
