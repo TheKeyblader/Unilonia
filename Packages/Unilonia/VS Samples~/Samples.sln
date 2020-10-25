@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30516.212
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{BF67FE87-EC46-41DA-AE7B-A0249793DD91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWorld", "HelloWorld\HelloWorld.csproj", "{BF67FE87-EC46-41DA-AE7B-A0249793DD91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoApp", "TodoApp\TodoApp.csproj", "{E585F4FC-6C4D-4876-A647-210AC45B9931}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoApp", "TodoApp\TodoApp.csproj", "{E585F4FC-6C4D-4876-A647-210AC45B9931}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlCatalog", "ControlCatalog\ControlCatalog.csproj", "{E5828EDC-9F5C-45D7-B336-4BE4D4EE9C94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E585F4FC-6C4D-4876-A647-210AC45B9931}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E585F4FC-6C4D-4876-A647-210AC45B9931}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E585F4FC-6C4D-4876-A647-210AC45B9931}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5828EDC-9F5C-45D7-B336-4BE4D4EE9C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5828EDC-9F5C-45D7-B336-4BE4D4EE9C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5828EDC-9F5C-45D7-B336-4BE4D4EE9C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5828EDC-9F5C-45D7-B336-4BE4D4EE9C94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
