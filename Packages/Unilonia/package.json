@@ -1,31 +1,36 @@
 {
-  "name": "com.unilonia.unilonia",
-  "version": "0.5.0",
-  "displayName": "Unilonia",
-  "description": "Unity plugin which allows running Avalonia on Unity",
-  "author": {
-    "name": "Jean-Francois Pustay",
-    "url": "https://github.com/TheKeyblader/Unilonia"
-  },
-  "dependencies": {
-    "com.solidalloy.type.references": "2.5.1"
-  },
-  "keywords": [
-    "Avalonia",
-    "UI",
-    "Xaml"
-  ],
-  "samples": [
-    {
-      "displayName": "Hello World",
-      "description": "Simple Hello World",
-      "path": "Samples~/HelloWorld"
-    },
-    {
-      "displayName": "TodoApp",
-      "description": "Simple TodoApp",
-      "path": "Samples~/TodoApp"
-    }
-  ],
-  "unity": "2019.4"
+	"name": "com.unilonia.unilonia",
+	"version": "0.5.0",
+	"displayName": "Unilonia",
+	"description": "Unity plugin which allows running Avalonia on Unity",
+	"author": {
+		"name": "Jean-Francois Pustay",
+		"url": "https://github.com/TheKeyblader/Unilonia"
+	},
+	"dependencies": {
+		"com.solidalloy.type.references": "2.5.1"
+	},
+	"keywords": [
+		"Avalonia",
+		"UI",
+		"Xaml"
+	],
+	"samples": [
+		{
+			"displayName": "Hello World",
+			"description": "Simple Hello World",
+			"path": "Samples~/HelloWorld"
+		},
+		{
+			"displayName": "TodoApp",
+			"description": "Simple TodoApp",
+			"path": "Samples~/TodoApp"
+		},
+		{
+			"displayName": "ControlCatalog",
+			"description": "ControlCatalog sample from Avalonia (Buggy)",
+			"path": "Samples~/ControlCatalog"
+		}
+	],
+	"unity": "2019.4"
 }

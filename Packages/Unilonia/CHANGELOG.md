@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New Samples ControlCatalog from Avalonia
+
 ### Fixed
 
 - Fixed resize of screen using mutex
