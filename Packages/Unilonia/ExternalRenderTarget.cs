@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Direct2D1;
@@ -25,46 +26,74 @@ namespace Unilonia
     {
         private Texture2D renderedTexture;
         private Texture2D visibleTexture;
+        private UnityTexture unityVisibleTexture;
         private DeviceContext renderTarget;
         private Bitmap1 bitmap;
         private static SharpDX.Direct3D11.Device Direct3D11Device;
 
         private bool hasRendererTarget;
+        private static Material blitMaterial;
 
         public Size ClientSize { get; set; }
-        public IntPtr TexturePtr { get; private set; }
+        public RenderTexture Texture { get; private set; }
+
+        private readonly Mutex mutex = new Mutex();
 
         static ExternalRenderTarget()
         {
             var empty = new UnityTexture(1, 1);
             var emptyText = new Texture2D(empty.GetNativeTexturePtr());
             Direct3D11Device = emptyText.Device;
+            blitMaterial = new Material(Shader.Find("Hidden/Spout/Blit"));
+            blitMaterial.hideFlags = HideFlags.DontSave;
+
         }
 
         public void AfterDrawing()
         {
             Direct2D1Platform.Direct3D11Device.ImmediateContext.CopyResource(renderedTexture, visibleTexture);
             Direct2D1Platform.Direct3D11Device.ImmediateContext.Flush();
+            mutex.ReleaseMutex();
+
+
+            UnityDispatcher.UnityThread.InvokeAsync(() =>
+            {
+                mutex.WaitOne();
+                if (unityVisibleTexture != null && Texture != null)
+                    Graphics.Blit(unityVisibleTexture, Texture, blitMaterial, 1);
+                mutex.ReleaseMutex();
+            }).Wait();
         }
 
         public void BeforeDrawing()
         {
-
+            mutex.WaitOne();
         }
 
         public void DestroyRenderTarget()
         {
+            mutex.WaitOne();
+            UnityEngine.Object.DestroyImmediate(unityVisibleTexture);
+            UnityEngine.Object.DestroyImmediate(Texture);
             renderedTexture?.Dispose();
             visibleTexture?.Dispose();
-            TexturePtr = IntPtr.Zero;
             renderTarget?.Dispose();
             bitmap?.Dispose();
             hasRendererTarget = false;
+            mutex.ReleaseMutex();
         }
 
         public RenderTarget GetOrCreateRenderTarget()
         {
-            if (!hasRendererTarget) renderTarget = Create();
+            if (!hasRendererTarget)
+            {
+                UnityDispatcher.UnityThread.InvokeAsync(() =>
+                {
+                    mutex.WaitOne();
+                    renderTarget = Create();
+                    mutex.ReleaseMutex();
+                }).Wait();
+            }
             return renderTarget;
         }
 
@@ -99,7 +128,10 @@ namespace Unilonia
 
             var sharedHandle = visibleTexture.QueryInterface<Resource>().SharedHandle;
             var unityTex = Direct3D11Device.OpenSharedResource<Texture2D>(sharedHandle);
-            TexturePtr = unityTex.NativePointer;
+
+            unityVisibleTexture = UnityTexture.CreateExternalTexture((int)ClientSize.Width, (int)ClientSize.Height, TextureFormat.BGRA32, false, true, unityTex.NativePointer);
+            unityVisibleTexture.hideFlags = HideFlags.DontSave;
+            Texture = new RenderTexture((int)ClientSize.Width, (int)ClientSize.Height, 1, RenderTextureFormat.BGRA32, 1);
 
             var surface = renderedTexture.QueryInterface<Surface>();
 
