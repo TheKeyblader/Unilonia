@@ -10,6 +10,8 @@ using Avalonia.Platform;
 using Avalonia.Rendering;
 using Avalonia.Threading;
 using Unilonia.Input;
+using UnityEngine;
+using Rect = Avalonia.Rect;
 
 namespace Unilonia
 {
@@ -51,7 +53,7 @@ namespace Unilonia
             get => _root.Renderer.DrawFps;
             set => _root.Renderer.DrawFps = value;
         }
-        public IntPtr TexturePtr => target.TexturePtr;
+        public Texture Texture => target.Texture;
 
         public TopLevelImpl(Size clientSize, bool useDeferredRenderer)
         {
@@ -129,10 +131,10 @@ namespace Unilonia
 
         internal void Resize(Size size)
         {
+            target.DestroyRenderTarget();
+            target.ClientSize = size;
             Dispatcher.UIThread.Post(() =>
             {
-                target.DestroyRenderTarget();
-                target.ClientSize = size;
                 Resized?.Invoke(size);
             });
         }
@@ -147,10 +149,7 @@ namespace Unilonia
 
         public void Dispose()
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                target.Dispose();
-            }).Wait();
+            target.Dispose();
         }
     }
 }

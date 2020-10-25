@@ -31,7 +31,7 @@ namespace Unilonia
                 }
                 if (signaled.HasValue)
                     Signaled?.Invoke(signaled);
-                WaitHandle.WaitAny(new[] { cancellationToken.WaitHandle, _event }, TimeSpan.FromMilliseconds(20));
+                WaitHandle.WaitAny(new[] { cancellationToken.WaitHandle, _event });
             }
         }
 
