@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed resize of screen using mutex
 - Fixed YFlip of texture using shader
-- Fixed Color space using shader 
+- Fixed Color space using shader
+- Fixed Missing scroll
 
 ## [0.5.0] - 2020-10-24
 
