@@ -99,6 +99,16 @@ namespace Unilonia.Input
                             TopLevel.InputRoot, RawPointerEventType.MiddleButtonUp, oldPosition.ToAvalonia(), modifiers));
                     }, DispatcherPriority.Input);
                 }
+
+                if (Mouse.current.scroll.IsActuated())
+                {
+                    var delta = (Mouse.current.scroll.ReadValue() / 120).ToAvalonia();
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        TopLevel.Input?.Invoke(new RawMouseWheelEventArgs(TopLevel.MouseDevice, timestamp,
+                            TopLevel.InputRoot, oldPosition.ToAvalonia(), delta, modifiers));
+                    });
+                }
             }
 
             if (Keyboard.current != null)
