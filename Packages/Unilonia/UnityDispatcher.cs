@@ -1,7 +1,5 @@
 ﻿using Avalonia.Threading;
-using SharpDX.Direct2D1;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using UnityEngine;

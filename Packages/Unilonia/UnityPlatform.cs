@@ -14,7 +14,7 @@ namespace Avalonia
     {
         public static T UseUnity<T>(this T builder) where T : AppBuilderBase<T>, new()
         {
-            builder.UseWindowingSubsystem(() => Unilonia.UnityPlatform.Initialize(builder.ApplicationType), "Unity");
+            builder.UseWindowingSubsystem(Unilonia.UnityPlatform.Initialize, "Unity");
             return builder;
         }
     }
@@ -22,7 +22,7 @@ namespace Avalonia
 
 namespace Unilonia
 {
-    class UnityPlatform : IPlatformSettings, IWindowingPlatform
+    internal class UnityPlatform : IPlatformSettings, IWindowingPlatform
     {
         private static readonly UnityPlatform s_instance = new UnityPlatform();
 
@@ -30,7 +30,7 @@ namespace Unilonia
 
         public TimeSpan DoubleClickTime => TimeSpan.FromSeconds(0.2);
 
-        public static void Initialize(Type appType)
+        public static void Initialize()
         {
             var threading = new UniloniaPlatformThreadingInterface();
             AvaloniaLocator.CurrentMutable

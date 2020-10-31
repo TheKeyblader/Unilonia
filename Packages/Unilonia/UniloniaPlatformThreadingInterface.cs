@@ -3,11 +3,10 @@ using System.Reactive.Disposables;
 using System.Threading;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using UnityEngine.Profiling;
 
 namespace Unilonia
 {
-    class UniloniaPlatformThreadingInterface : IPlatformThreadingInterface
+    internal class UniloniaPlatformThreadingInterface : IPlatformThreadingInterface
     {
         public UniloniaPlatformThreadingInterface()
         {

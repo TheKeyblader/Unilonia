@@ -22,7 +22,7 @@ namespace Avalonia
 
 namespace Unilonia.Logging
 {
-    public class DebugLogSink : ILogSink
+    internal class DebugLogSink : ILogSink
     {
         private readonly LogEventLevel _level;
         private readonly IList<string> _areas;
