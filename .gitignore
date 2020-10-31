@@ -78,5 +78,5 @@ crashlytics-build.properties
 !**/VS Samples~/*.sln
 
 #Connector
-!**/Unilonia.Connector~/**/*.csproj
-!**/Unilonia.Connector~/*.sln
+!**/Connector~/**/*.csproj
+!**/Connector~/*.sln
