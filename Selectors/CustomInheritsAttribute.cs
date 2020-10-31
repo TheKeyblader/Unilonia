@@ -4,7 +4,7 @@ using TypeReferences;
 
 namespace Unilonia.Selectors
 {
-    public class CustomInheritsAttribute : TypeOptionsAttribute
+    internal class CustomInheritsAttribute : TypeOptionsAttribute
     {
         public Type BaseClass { get; set; }
 

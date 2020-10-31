@@ -1,38 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Direct2D1;
-using Packages.Unilonia;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using UnityEngine;
-using UnityEngine.UI;
 using DeviceContext = SharpDX.Direct2D1.DeviceContext;
-using Factory = SharpDX.Direct2D1.Factory;
 using RenderTarget = SharpDX.Direct2D1.RenderTarget;
 using Resource = SharpDX.DXGI.Resource;
-using Resource3D = SharpDX.Direct3D11.Resource;
 using Texture2D = SharpDX.Direct3D11.Texture2D;
 using UnityTexture = UnityEngine.Texture2D;
 
 namespace Unilonia
 {
-    public class ExternalRenderTarget : IExternalDirect2DRenderTargetSurface, IDisposable
+    internal class ExternalRenderTarget : IExternalDirect2DRenderTargetSurface, IDisposable
     {
         private Texture2D renderedTexture;
         private Texture2D visibleTexture;
         private UnityTexture unityVisibleTexture;
         private DeviceContext renderTarget;
         private Bitmap1 bitmap;
-        private static SharpDX.Direct3D11.Device Direct3D11Device;
+        private static readonly SharpDX.Direct3D11.Device Direct3D11Device;
 
         private bool hasRendererTarget;
-        private static Material blitMaterial;
+        private static readonly Material blitMaterial;
 
         public Size ClientSize { get; set; }
         public RenderTexture Texture { get; private set; }
@@ -54,7 +46,6 @@ namespace Unilonia
             Direct2D1Platform.Direct3D11Device.ImmediateContext.CopyResource(renderedTexture, visibleTexture);
             Direct2D1Platform.Direct3D11Device.ImmediateContext.Flush();
             mutex.ReleaseMutex();
-
 
             UnityDispatcher.UnityThread.InvokeAsync(() =>
             {

@@ -5,7 +5,7 @@ using Avalonia.Shared.PlatformSupport;
 
 namespace Unilonia
 {
-    static class UnityRuntimePlatformServices
+    internal static class UnityRuntimePlatformServices
     {
         public static void Register(Assembly assembly = null)
         {

@@ -16,7 +16,7 @@ using Rect = Avalonia.Rect;
 namespace Unilonia
 {
 
-    public class TopLevelImpl : ITopLevelImpl
+    internal class TopLevelImpl : ITopLevelImpl
     {
         public Size ClientSize { get; private set; }
 
