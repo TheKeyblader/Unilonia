@@ -62,7 +62,16 @@ namespace Unilonia
             }
         }
 
-        public static void AvaloniaThread(object parameters)
+        public static void Stop(int exitCode = 0)
+        {
+            if (Application.Current != null)
+            {
+                var lifetime = Application.Current.ApplicationLifetime as IControlledApplicationLifetime;
+                lifetime.Shutdown(exitCode);
+            }
+        }
+
+        private static void AvaloniaThread(object parameters)
         {
             var applicationType = (Type)parameters;
 

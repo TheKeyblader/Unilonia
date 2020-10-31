@@ -76,3 +76,7 @@ crashlytics-build.properties
 #Samples
 !**/VS Samples~/**/*.csproj
 !**/VS Samples~/*.sln
+
+#Connector
+!**/Connector~/**/*.csproj
+!**/Connector~/*.sln

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Unilonia.Input
 {
-    public class ClipboardImpl : IClipboard
+    internal class ClipboardImpl : IClipboard
     {
         public Task ClearAsync()
         {

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Avalonia.Platform;
 
 namespace Unilonia
 {
-    class PlatformIconLoader : IPlatformIconLoader
+    internal class PlatformIconLoader : IPlatformIconLoader
     {
         public IWindowIconImpl LoadIcon(IBitmapImpl bitmap)
         {

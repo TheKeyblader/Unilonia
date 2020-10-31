@@ -1,10 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using Packages.Unilonia.Selectors;
 using System;
 using TypeReferences;
-using Unilonia;
 using Unilonia.Input;
 using Unilonia.Selectors;
 using Unilonia.Settings;
@@ -13,7 +11,7 @@ using UnityEngine.UI;
 using AvaloniaApplication = Avalonia.Application;
 using Canvas = UnityEngine.Canvas;
 
-namespace Packages.Unilonia
+namespace Unilonia
 {
     [RequireComponent(typeof(Canvas))]
     [RequireComponent(typeof(RectTransform))]
@@ -46,7 +44,7 @@ namespace Packages.Unilonia
             rawImage.color = Color.white;
         }
 
-        void Start()
+        private void Start()
         {
             var settings = UniloniaSettings.Load();
 

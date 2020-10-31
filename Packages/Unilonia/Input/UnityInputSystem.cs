@@ -15,7 +15,7 @@ using System;
 
 namespace Unilonia.Input
 {
-    public class UnityInputSystem : MonoBehaviour
+    internal class UnityInputSystem : MonoBehaviour
     {
         internal TopLevelImpl TopLevel { get; set; }
         private Vector2 oldPosition;
