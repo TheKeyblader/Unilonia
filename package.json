@@ -1,6 +1,6 @@
 {
 	"name": "com.unilonia.unilonia",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"displayName": "Unilonia",
 	"description": "Unity plugin which allows running Avalonia on Unity",
 	"author": {
@@ -8,7 +8,8 @@
 		"url": "https://github.com/TheKeyblader/Unilonia"
 	},
 	"dependencies": {
-		"com.solidalloy.type.references": "2.5.1"
+		"com.solidalloy.type.references": "2.5.1",
+		"com.unity.nuget.newtonsoft-json": "2.0.0"
 	},
 	"keywords": [
 		"Avalonia",
