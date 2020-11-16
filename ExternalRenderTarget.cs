@@ -63,15 +63,18 @@ namespace Unilonia
 
         public void DestroyRenderTarget()
         {
-            mutex.WaitOne();
-            UnityEngine.Object.DestroyImmediate(unityVisibleTexture);
-            UnityEngine.Object.DestroyImmediate(Texture);
-            renderedTexture?.Dispose();
-            visibleTexture?.Dispose();
-            renderTarget?.Dispose();
-            bitmap?.Dispose();
-            hasRendererTarget = false;
-            mutex.ReleaseMutex();
+            if (hasRendererTarget)
+            {
+                mutex.WaitOne();
+                UnityEngine.Object.DestroyImmediate(unityVisibleTexture);
+                UnityEngine.Object.DestroyImmediate(Texture);
+                renderedTexture?.Dispose();
+                visibleTexture?.Dispose();
+                renderTarget?.Dispose();
+                bitmap?.Dispose();
+                hasRendererTarget = false;
+                mutex.ReleaseMutex();
+            }
         }
 
         public RenderTarget GetOrCreateRenderTarget()

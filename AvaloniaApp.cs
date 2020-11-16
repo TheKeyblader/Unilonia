@@ -14,54 +14,69 @@ using Application = Avalonia.Application;
 
 namespace Unilonia
 {
+    [InitializeOnLoad]
     public static class AvaloniaApp
     {
 #if UNITY_EDITOR
-
-        public static void Load()
+        static AvaloniaApp()
         {
-            UniloniaSettings.Load();
+            var settings = UniloniaSettings.Load();
             EditorApplication.playModeStateChanged += VerifySettings;
+            EditorApplication.playModeStateChanged += (state) =>
+            {
+                if (state == PlayModeStateChange.ExitingPlayMode)
+                {
+                    Stop();
+                }
+            };
+            UnityEngine.Application.quitting += Stop;
+            if (settings.applicationType.Type != null)
+                Start();
         }
-
         private static void VerifySettings(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingEditMode)
                 UniloniaSettings.Load();
         }
 #endif
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void SelfStart()
+        {
+            Start();
+        }
 
-        private static object _lock;
+        private static readonly object _lock = new object();
         private static Thread avaloniaThread;
         private static EventWaitHandle init;
 
-        static AvaloniaApp()
+        public static void Start()
         {
-            _lock = new object();
-        }
+            if (UnityEngine.Application.isPlaying && UnityEngine.Object.FindObjectOfType<UnityDispatcher>() == null)
+            {
+                var gameObject = new GameObject("AvaloniaThreading");
+                gameObject.AddComponent<UnityDispatcher>();
+            }
 
-        public static void Start(Type overrideApplicationType = null)
-        {
             lock (_lock)
             {
                 if (Application.Current == null)
                 {
-                    var gameObject = new GameObject("AvaloniaThreading");
-                    gameObject.AddComponent<UnityDispatcher>();
-
                     var settings = UniloniaSettings.Load();
-                    if (settings.applicationType.Type == null && overrideApplicationType == null) throw new ArgumentNullException(nameof(UniloniaSettings.applicationType));
+                    if (settings.applicationType.Type == null) throw new ArgumentNullException(nameof(UniloniaSettings.applicationType));
 
                     init = new EventWaitHandle(false, EventResetMode.ManualReset);
                     avaloniaThread = new Thread(AvaloniaThread);
                     avaloniaThread.Name = "Avalonia Thread";
-                    avaloniaThread.Start(overrideApplicationType ?? settings.applicationType.Type);
-                    init.WaitOne();
+                    avaloniaThread.Start(settings.applicationType.Type);
+                    if (UnityEngine.Application.isPlaying)
+                        init.WaitOne();
                     init.Dispose();
+                    init = null;
                 }
             }
         }
 
+        public static void Stop() => Stop(0);
         public static void Stop(int exitCode = 0)
         {
             if (Application.Current != null)
@@ -88,7 +103,8 @@ namespace Unilonia
             var lifetime = new UnityLifetime();
             builder.SetupWithLifetime(lifetime);
 
-            init.Set();
+            if (init != null)
+                init.Set();
 
             lifetime.Start(Array.Empty<string>());
             builder.Instance.Run(lifetime.Token);
@@ -115,7 +131,12 @@ namespace Unilonia
                 var e = new ControlledApplicationLifetimeExitEventArgs(exitCode);
                 Exit?.Invoke(this, e);
                 ExitCode = e.ApplicationExitCode;
+#if UNITY_EDITOR
+                EditorApplication.ExitPlaymode();
+#else
                 _cts.Cancel();
+                UnityEngine.Application.Quit(exitCode);                
+#endif
             }
         }
     }

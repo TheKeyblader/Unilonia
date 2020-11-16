@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Threading;
+using Avalonia;
 using Avalonia.Platform;
 using Avalonia.Threading;
 
@@ -11,11 +12,13 @@ namespace Unilonia
         public UniloniaPlatformThreadingInterface()
         {
             _thread = Thread.CurrentThread;
+            _event = new AutoResetEvent(false);
+            _lock = new object();
         }
 
-        private AutoResetEvent _event = new AutoResetEvent(false);
-        private Thread _thread;
-        private object _lock = new object();
+        private readonly AutoResetEvent _event;
+        private readonly Thread _thread;
+        private readonly object _lock;
         private DispatcherPriority? _signaledPriority;
 
         public void RunLoop(CancellationToken cancellationToken)
@@ -67,7 +70,6 @@ namespace Unilonia
                 }
             });
         }
-
         public void Signal(DispatcherPriority priority)
         {
             lock (_lock)

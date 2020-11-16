@@ -282,6 +282,11 @@ namespace Unilonia.Input
         };
 
         private char[] excludeChars = new[] { '\b', '\t' };
+
+        public void OnDestroy()
+        {
+            Keyboard.current.onTextInput -= CharEvent;
+        }
     }
 }
 #endif
