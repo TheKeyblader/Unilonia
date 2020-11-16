@@ -141,6 +141,7 @@ namespace Unilonia
 
         internal void Close()
         {
+            target.DestroyRenderTarget();
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Closed?.Invoke();
@@ -150,6 +151,7 @@ namespace Unilonia
         public void Dispose()
         {
             target.Dispose();
+            _root.Dispose();
         }
     }
 }

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using AvaloniaApplication = Avalonia.Application;
 using Unilonia.Selectors;
+using UnityEditor.Compilation;
 
 namespace Unilonia.Settings
 {
@@ -32,5 +33,13 @@ namespace Unilonia.Settings
             return Resources.Load<UniloniaSettings>(SettingsPath);
 #endif
         }
+
+#if UNITY_EDITOR
+        public void OnValidate()
+        {
+            if (AvaloniaApplication.Current != null && AvaloniaApplication.Current.GetType() != applicationType.Type)
+                CompilationPipeline.RequestScriptCompilation();
+        }
+#endif
     }
 }
