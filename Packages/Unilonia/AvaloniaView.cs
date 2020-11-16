@@ -8,6 +8,7 @@ using Unilonia.Selectors;
 using Unilonia.Settings;
 using UnityEngine;
 using UnityEngine.UI;
+using Application = UnityEngine.Application;
 using AvaloniaApplication = Avalonia.Application;
 using Canvas = UnityEngine.Canvas;
 
@@ -24,10 +25,6 @@ namespace Unilonia
 
         [InspectorName("Draw FPS")]
         public bool drawFps;
-
-        [CustomInherits(typeof(AvaloniaApplication), ExcludeNone = false)]
-        [InspectorName("For sample only")]
-        public TypeReference overrideApplicationType;
 
         private TopLevelImpl topLevel;
         private Vector2Int screenSize;
@@ -46,23 +43,24 @@ namespace Unilonia
 
         private void Start()
         {
+            if (AvaloniaApplication.Current == null)
+                throw new InvalidOperationException("Avalonia App is not started");
+
             var settings = UniloniaSettings.Load();
-
-            if (viewType.Type == null) throw new ArgumentNullException("View");
-            AvaloniaApp.Start(overrideApplicationType.Type);
-
             screenSize = new Vector2Int(Screen.width, Screen.height);
             topLevel = new TopLevelImpl(new Size(Screen.width, Screen.height), settings.useDeferredRendering);
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 topLevel.Init();
                 topLevel.Content = (Control)Activator.CreateInstance(viewType.Type, new object[0]);
-                topLevel.Paint(new Avalonia.Rect(0, 0, screenSize.x, screenSize.y));
             }).Wait();
 
 #if ENABLE_INPUT_SYSTEM
-            var input = gameObject.AddComponent<UnityInputSystem>();
-            input.TopLevel = topLevel;
+            if (Application.isPlaying)
+            {
+                var input = gameObject.AddComponent<UnityInputSystem>();
+                input.TopLevel = topLevel;
+            }
 #endif
         }
 

@@ -1,28 +1,42 @@
-﻿using Avalonia.Threading;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Avalonia.Threading;
+using UnityEditor;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("Unilonia")]
 namespace Unilonia
 {
-    public class UnityDispatcher : MonoBehaviour, IDispatcher
+    [InitializeOnLoad]
+    public class UnityEditorDispatcher : IDispatcher
     {
-        public static IDispatcher UnityThread { get; internal set; }
-
         [ThreadStatic]
         private static bool isUnityThread;
 
-        private ConcurrentQueue<Task> _taskqueue = new ConcurrentQueue<Task>();
-
-        public UnityDispatcher()
+        static UnityEditorDispatcher()
         {
-            if (UnityThread != null) throw new InvalidOperationException("One unity dispatcher allowed !");
-            UnityThread = this;
+            if (!EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                new UnityEditorDispatcher();
+            }
+        }
+
+        private readonly ConcurrentQueue<Task> _taskqueue = new ConcurrentQueue<Task>();
+
+        public UnityEditorDispatcher()
+        {
+            if (UnityDispatcher.UnityThread != null) throw new InvalidOperationException("One unity dispatcher allowed !");
+            UnityDispatcher.UnityThread = this;
             isUnityThread = true;
+
+            EditorApplication.update += Update;
+            EditorApplication.playModeStateChanged += (state) =>
+            {
+                if (state == PlayModeStateChange.EnteredEditMode)
+                    Attach();
+                else if (state == PlayModeStateChange.ExitingEditMode)
+                    Detach();
+            };
         }
 
         public bool CheckAccess() => isUnityThread;
@@ -81,10 +95,15 @@ namespace Unilonia
             }
         }
 
-        public void OnDestroy()
+        public void Detach()
         {
-            UnityThread = null;
+            UnityDispatcher.UnityThread = null;
             Update();
+        }
+
+        public void Attach()
+        {
+            UnityDispatcher.UnityThread = this;
         }
     }
 }

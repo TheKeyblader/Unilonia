@@ -158,10 +158,6 @@ MonoBehaviour:
     GUID: 
     _typeNameAndAssembly: TodoApp.Views.MainView, TodoApp
   drawFps: 1
-  overrideApplicationType:
-    GuidAssignmentFailed: 0
-    GUID: 
-    _typeNameAndAssembly: TodoApp.App, TodoApp
 --- !u!114 &188038193
 MonoBehaviour:
   m_ObjectHideFlags: 0
