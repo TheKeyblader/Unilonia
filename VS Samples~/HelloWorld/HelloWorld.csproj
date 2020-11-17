@@ -4,7 +4,7 @@
     <TargetFrameworks>netcoreapp3.1;netstandard2.0;</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0-preview5" />
+    <PackageReference Include="Avalonia" Version="0.10.0-preview6" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview5" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview6" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)' == 'netstandard2.0'">
